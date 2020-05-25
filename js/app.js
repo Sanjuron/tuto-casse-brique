@@ -20,27 +20,6 @@ document.addEventListener("keydown", keyDownHandler, false); // qd keydown est d
 document.addEventListener("keyup", keyUpHandler, false);
 
 
-//test pour imprimer un rectangle rouge dans le canvas
-// ctx.beginPath();
-// ctx.rect(30, 60, 60, 60); // les deux premières valeurs sont les coord du coin supérieur gauche (h,v). Les 2 autres la largeur et hauteur.
-// ctx.fillStyle = "#1e73be"; //stocke couleur
-// ctx.fill(); //utilise la couleur pour peindre le carré
-// ctx.closePath();
-
-// // pour un cercle
-// ctx.beginPath();
-// ctx.arc(240, 160, 20, 0, Math.PI*2, false); (x(centre), y(centre), rayon, angleDepart, angleFin, directionDessin)
-// ctx.strokeStyle = "green"; // stroke pour le contour
-// ctx.stroke();
-// ctx.closePath(); 
-
-// ctx.beginPath();
-// ctx.rect(300, 10, 100, 40);
-// ctx.strokeStyle = "rgba(0, 0, 255, 0.5)";
-// ctx.stroke();
-// ctx.closePath();
-
-
 function keyDownHandler(e) {  // qd on presse une touche la variable devient true
     if(e.keyCode == 39) { // 39 est le code de la touche gauche du clavier
     	rightPressed = true;
@@ -81,11 +60,20 @@ function draw() {
 	drawBall(); // ne pas oublier d'inclure drawBall()
 	drawPaddle(); // appelle la fonction pour l'afficher à l'écran
 
-	if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
+	if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) { //
 		dx = -dx;
 	}
-	if(y + dy > canvas.height-ballRadius || y + dy < ballRadius) {
+
+	if(y + dy < ballRadius) {
 		dy = -dy;
+	} else if (y + dy > canvas.height-ballRadius) {
+		if(x > paddleX && x < paddleX + paddleWidth){ // crée un game over si la balle touche la paroi inférieur; si touche paddle sens inverse
+			dy = -dy; // - (dy + 2) ferait augmenter la vitesse à chaque coup réussi
+
+		}else {
+		alert("GAME OVER!");
+		document.location.reload();
+			}
 	}
 
 	if(rightPressed && paddleX < canvas.width-paddleWidth) {
