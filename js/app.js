@@ -16,6 +16,24 @@ let paddleX = (canvas.width-paddleWidth)/2;
 let rightPressed = false;
 let leftPressed = false; // les touches préssées de la souris sont initialisées à fausse.
 
+//mise en place des briques:
+let brickRowCount = 3;
+let brickColumnCount = 5;
+let brickWidth = 75;
+let brickHeight = 20;
+let brickPadding = 10;
+let brickOffsetTop = 30;
+let brickOffsetLeft = 30;
+
+//insertion des briques dans un tableau en 2D:
+let bricks = [];
+for (let col=0; col<brickColumnCount; col++) {
+	bricks[col] = [];
+	for(let row=0; row<brickRowCount; row++) {
+		bricks[col][row] = { x: 0, y: 0};
+	}
+}
+
 document.addEventListener("keydown", keyDownHandler, false); // qd keydown est déclenché, la func keyDownHandler est exécutée.
 document.addEventListener("keyup", keyUpHandler, false);
 
@@ -49,14 +67,31 @@ function drawBall() {
 function drawPaddle() {
 	ctx.beginPath();
 	ctx.rect(paddleX, canvas.height-paddleHeight, paddleWidth, paddleHeight);
-	ctx.fillStyle = '#0095DD';
+	ctx.fillStyle = '#1e73be';
 	ctx.fill();
 	ctx.closePath();
 }	
 
+function drawBricks() {
+	for(let col=0; col<brickColumnCount; col++) {
+		for(let row=0; row<brickRowCount; row++) {
+			let brickX = (col*(brickWidth+brickPadding)) + brickOffsetLeft;
+			let brickY = (row*(brickHeight+brickPadding)) + brickOffsetTop;
+			bricks[col][row].x = brickX;
+			bricks[col][row].y = brickY;
+			ctx.beginPath(); //dessine les briques
+			ctx.rect(brickX, brickY, brickWidth, brickHeight);
+			ctx.fillStyle = "#1e73be";
+			ctx.fill();
+			ctx.closePath();
+		}
+	}
+}
+
 
 function draw() {
 	ctx.clearRect(0, 0, canvas.width, canvas.height); // méthode qui efface le contenue du canevas.
+	drawBricks(); //affiche les briques
 	drawBall(); // ne pas oublier d'inclure drawBall()
 	drawPaddle(); // appelle la fonction pour l'afficher à l'écran
 
