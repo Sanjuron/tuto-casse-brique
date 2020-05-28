@@ -56,6 +56,17 @@ function keyUpHandler(e) { // la variable redevient fausse lorsque la touche est
 	}
 }	
 
+function collisionDetection() {
+	for(let col=0; col<brickColumnCount; col++){
+		for(let row=0; row<brickRowCount; row++){
+			let br = bricks[col][row];
+			if(x > br.x && x <br.x+brickWidth && y > br.y && y < br.y+brickHeight){
+				dy = -dy;
+			}
+		}
+	}
+}
+
 function drawBall() {
 	ctx.beginPath();
 	ctx.arc(x, y, ballRadius, 0, Math.PI*2);
