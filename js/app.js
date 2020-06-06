@@ -30,7 +30,7 @@ let bricks = [];
 for (let col=0; col<brickColumnCount; col++) {
 	bricks[col] = [];
 	for(let row=0; row<brickRowCount; row++) {
-		bricks[col][row] = { x: 0, y: 0};
+		bricks[col][row] = { x: 0, y: 0, status: 1};
 	}
 }
 
@@ -57,14 +57,15 @@ function keyUpHandler(e) { // la variable redevient fausse lorsque la touche est
 }	
 
 function collisionDetection() {
-	for(let col=0; col<brickColumnCount; col++){
-		for(let row=0; row<brickRowCount; row++){
-			let br = bricks[col][row];
-			if(x > br.x && x <br.x+brickWidth && y > br.y && y < br.y+brickHeight){
-				dy = -dy;
-			}
-		}
-	}
+    for(let col=0; col<brickColumnCount; col++) {
+        for(let row=0; row<brickRowCount; row++) {
+            let br = bricks[col][row];
+            if(x > br.x && x < br.x+brickWidth && y > br.y && y < br.y+brickHeight) {
+				dy = -dy; // la balle repart en sens inverse qd elle touche une brique
+				br.status = 0; // le status de la brique passe à 0 lorsqu'elle est touchée
+            }
+        }
+    }
 }
 
 function drawBall() {
@@ -81,11 +82,13 @@ function drawPaddle() {
 	ctx.fillStyle = '#1e73be';
 	ctx.fill();
 	ctx.closePath();
+	collisionDetection();
 }	
 
 function drawBricks() {
 	for(let col=0; col<brickColumnCount; col++) {
 		for(let row=0; row<brickRowCount; row++) {
+			if(bricks[col][row].status == 1){ // si le statut de la brique est égale à 1 alors il faut la dessiner.
 			let brickX = (col*(brickWidth+brickPadding)) + brickOffsetLeft;
 			let brickY = (row*(brickHeight+brickPadding)) + brickOffsetTop;
 			bricks[col][row].x = brickX;
@@ -95,6 +98,7 @@ function drawBricks() {
 			ctx.fillStyle = "#1e73be";
 			ctx.fill();
 			ctx.closePath();
+			}
 		}
 	}
 }
