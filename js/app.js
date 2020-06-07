@@ -25,6 +25,7 @@ let brickPadding = 10;
 let brickOffsetTop = 30;
 let brickOffsetLeft = 30;
 let score = 0;
+let lives = 3;
 
 //insertion des briques dans un tableau en 2D:
 let bricks = [];
@@ -39,14 +40,14 @@ document.addEventListener("keydown", keyDownHandler, false); // qd keydown est d
 document.addEventListener("keyup", keyUpHandler, false);
 document.addEventListener("mousemove", mouseMoveHandler, false);
 
-function mouseMoveHandler(e) {
+function mouseMoveHandler(e) { // prise en compte du mouvement de la souris
 	let relativeX = e.clientX - canvas.offsetLeft;
 	if(relativeX > 0 && relativeX < canvas.width) {
 		paddleX = relativeX - paddleWidth/2;
 	}
 }
 
-function keyDownHandler(e) {
+function keyDownHandler(e) { // prise en compte du jeu au clavier
     if(e.key == "Right" || e.key == "ArrowRight") {
         rightPressed = true;
     }
@@ -76,7 +77,7 @@ function collisionDetection() {
 				if (score == brickRowCount*brickColumnCount) {
 					alert("Bravo! Vous avez gagné!");
 					document.location.reload();
-					clearInterval(interval); //nécessaire pour que chrome termine le jeu
+					// clearInterval(interval); //nécessaire pour que chrome termine le jeu
 				}
 			}
 		}
@@ -86,8 +87,14 @@ function collisionDetection() {
 
 function drawScore() {
 	ctx.font = "16px Arial"; 
-	ctx.fillStyle = "#0095DD";
+	ctx.fillStyle = "#1e73be";
 	ctx.fillText("Score: " +score, 8, 20); // 8 et 20 sont les coordonnées du score dans le canvas.
+}
+
+function drawLives() {
+	ctx.font = "16px Arial";
+	ctx.fillStyle = "#1e73be";
+	ctx.fillText("Vies " + lives, canvas.width-65, 20);
 }
 
 function drawBall() {
@@ -132,6 +139,7 @@ function draw() {
 	drawBall(); // ne pas oublier d'inclure drawBall()
 	drawPaddle(); // appelle la fonction pour l'afficher à l'écran
 	drawScore();
+	drawLives();
 	collisionDetection();
 
 	if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) { //
@@ -145,9 +153,19 @@ function draw() {
 			dy = -dy; // - (dy + 2) ferait augmenter la vitesse à chaque coup réussi
 		}
 		else {
-		alert("GAME OVER!");
-		document.location.reload(); // pourquoi n'est-il pas pris en compte ?*
-		clearInterval(interval); 
+			lives--; 
+			if(!lives) {
+				alert("GAME OVER");
+				document.location.reload(); // relance le document
+				// clearInterval(interval); // nécessaire pour chrome
+			} else {
+				x = canvas.width/2;
+				y = canvas.height-30;
+				dx = 2;
+				dy = -2;
+				paddleX = (canvas.width	-paddleWidth)/2;
+
+			}
 		}
 	}
 
@@ -160,8 +178,10 @@ function draw() {
 
 	x += dx; //incrémentation de x et y par 2 et -2 afin de créer un mouvement
 	y += dy;
+
+	requestAnimationFrame(draw);
 }
 
 
-let interval = setInterval(draw, 10); // draw sera appelée toutes les 10 millisecondes.
+draw(); // draw sera appelée toutes les 10 millisecondes.
 
