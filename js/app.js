@@ -1,4 +1,5 @@
 "use strict";
+
 let canvas = document.getElementById("myCanvas");
 let ctx = canvas.getContext("2d"); // stocke le contexte de rendu 2D
 let x = canvas.width/2;
@@ -8,7 +9,6 @@ let dx = 2; // déplacement de 2 vers la droite
 let dy = -2; // déplacement de 2 vers le haut
 
 let ballRadius = 10; 
-
 let paddleHeight = 10;
 let paddleWidth = 75;
 let paddleX = (canvas.width-paddleWidth)/2;
@@ -37,7 +37,14 @@ for (let col=0; col<brickColumnCount; col++) {
 
 document.addEventListener("keydown", keyDownHandler, false); // qd keydown est déclenché, la func keyDownHandler est exécutée.
 document.addEventListener("keyup", keyUpHandler, false);
+document.addEventListener("mousemove", mouseMoveHandler, false);
 
+function mouseMoveHandler(e) {
+	let relativeX = e.clientX - canvas.offsetLeft;
+	if(relativeX > 0 && relativeX < canvas.width) {
+		paddleX = relativeX - paddleWidth/2;
+	}
+}
 
 function keyDownHandler(e) {
     if(e.key == "Right" || e.key == "ArrowRight") {
