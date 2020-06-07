@@ -17,13 +17,14 @@ let rightPressed = false;
 let leftPressed = false; // les touches préssées de la souris sont initialisées à fausse.
 
 //mise en place des briques:
-let brickRowCount = 3;
-let brickColumnCount = 5;
+let brickRowCount = 5;
+let brickColumnCount = 3;
 let brickWidth = 75;
 let brickHeight = 20;
 let brickPadding = 10;
 let brickOffsetTop = 30;
 let brickOffsetLeft = 30;
+let score = 0;
 
 //insertion des briques dans un tableau en 2D:
 let bricks = [];
@@ -38,34 +39,48 @@ document.addEventListener("keydown", keyDownHandler, false); // qd keydown est d
 document.addEventListener("keyup", keyUpHandler, false);
 
 
-function keyDownHandler(e) {  // qd on presse une touche la variable devient true
-    if(e.keyCode == 39) { // 39 est le code de la touche gauche du clavier
-    	rightPressed = true;
-    } 
-    else if(e.keyCode == 37) { // 37 est le code de la touche droite du clavier
-    		leftPressed = true;
+function keyDownHandler(e) {
+    if(e.key == "Right" || e.key == "ArrowRight") {
+        rightPressed = true;
     }
-}	
+    else if(e.key == "Left" || e.key == "ArrowLeft") {
+        leftPressed = true;
+    }
+}
 
-function keyUpHandler(e) { // la variable redevient fausse lorsque la touche est relachée
-	if(e.keyCode == 39) {
-		rightPressed = false;
-	} 
-	else if(e.keyCode == 37) {
-		leftPressed = false;
-	}
-}	
+function keyUpHandler(e) {
+    if(e.key == "Right" || e.key == "ArrowRight") {
+        rightPressed = false;
+    }
+    else if(e.key == "Left" || e.key == "ArrowLeft") {
+        leftPressed = false;
+    }
+}
 
 function collisionDetection() {
     for(let col=0; col<brickColumnCount; col++) {
         for(let row=0; row<brickRowCount; row++) {
-            let br = bricks[col][row];
+			let br = bricks[col][row];
+			if(br.status == 1){
             if(x > br.x && x < br.x+brickWidth && y > br.y && y < br.y+brickHeight) {
 				dy = -dy; // la balle repart en sens inverse qd elle touche une brique
 				br.status = 0; // le status de la brique passe à 0 lorsqu'elle est touchée
-            }
+				score++; // à chaque collision, le score s'incrémente
+				if (score == brickRowCount*brickColumnCount) {
+					alert("Bravo! Vous avez gagné!");
+					document.location.reload();
+					clearInterval(interval); //nécessaire pour que chrome termine le jeu
+				}
+			}
+		}
         }
     }
+}
+
+function drawScore() {
+	ctx.font = "16px Arial"; 
+	ctx.fillStyle = "#0095DD";
+	ctx.fillText("Score: " +score, 8, 20); // 8 et 20 sont les coordonnées du score dans le canvas.
 }
 
 function drawBall() {
@@ -89,8 +104,8 @@ function drawBricks() {
 	for(let col=0; col<brickColumnCount; col++) {
 		for(let row=0; row<brickRowCount; row++) {
 			if(bricks[col][row].status == 1){ // si le statut de la brique est égale à 1 alors il faut la dessiner.
-			let brickX = (col*(brickWidth+brickPadding)) + brickOffsetLeft;
-			let brickY = (row*(brickHeight+brickPadding)) + brickOffsetTop;
+			let brickX = (row*(brickWidth+brickPadding)) + brickOffsetLeft;
+			let brickY = (col*(brickHeight+brickPadding)) + brickOffsetTop;
 			bricks[col][row].x = brickX;
 			bricks[col][row].y = brickY;
 			ctx.beginPath(); //dessine les briques
@@ -109,21 +124,24 @@ function draw() {
 	drawBricks(); //affiche les briques
 	drawBall(); // ne pas oublier d'inclure drawBall()
 	drawPaddle(); // appelle la fonction pour l'afficher à l'écran
+	drawScore();
+	collisionDetection();
 
 	if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) { //
 		dx = -dx;
 	}
-
 	if(y + dy < ballRadius) {
 		dy = -dy;
-	} else if (y + dy > canvas.height-ballRadius) {
+	} 
+	else if (y + dy > canvas.height-ballRadius) {
 		if(x > paddleX && x < paddleX + paddleWidth){ // crée un game over si la balle touche la paroi inférieur; si touche paddle sens inverse
 			dy = -dy; // - (dy + 2) ferait augmenter la vitesse à chaque coup réussi
-
-		}else {
+		}
+		else {
 		alert("GAME OVER!");
-		document.location.reload();
-			}
+		document.location.reload(); // pourquoi n'est-il pas pris en compte ?*
+		clearInterval(interval); 
+		}
 	}
 
 	if(rightPressed && paddleX < canvas.width-paddleWidth) {
@@ -138,5 +156,5 @@ function draw() {
 }
 
 
-setInterval(draw, 10); // draw sera appelée toutes les 10 millisecondes.
+let interval = setInterval(draw, 10); // draw sera appelée toutes les 10 millisecondes.
 
